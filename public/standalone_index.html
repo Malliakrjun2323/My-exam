@@ -1507,16 +1507,17 @@
       if (!mistakeNotebook.some(m => m.questionId === q.id)) {
         const item = {
           id: `mistake_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-          questionId: q.id,
-          question: q.question,
-          questionKn: q.questionKn,
-          options: q.options,
-          correctAnswerIndex: q.correctAnswerIndex,
-          userSelectedIndex: userSelectedIdx,
-          explanation: q.explanation,
-          explanationKn: q.explanationKn,
-          subjectId: q.subjectId,
-          subCategoryId: q.subCategoryId,
+          questionId: q.id || '',
+          question: q.question || '',
+          questionKn: q.questionKn || '',
+          options: Array.isArray(q.options) ? q.options : [],
+          correctAnswerIndex: typeof q.correctAnswerIndex === 'number' ? q.correctAnswerIndex : 0,
+          userSelectedIndex: typeof userSelectedIdx === 'number' ? userSelectedIdx : -1,
+          explanation: q.explanation || '',
+          explanationKn: q.explanationKn || '',
+          subjectId: q.subjectId || 'pyq',
+          subCategoryId: q.subCategoryId || 'pyq-2025-exams',
+          userNotes: '',
           savedAt: Date.now()
         };
         mistakeNotebook.push(item);

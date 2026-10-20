@@ -378,12 +378,15 @@ export const QuizView: React.FC<QuizViewProps> = ({
       id: `mistake_${Date.now()}_${q.id}`,
       questionId: q.id,
       question: q,
-      selectedOptionIndex: activeMistakeQuestion.selectedIdx,
+      selectedOptionIndex:
+        typeof activeMistakeQuestion.selectedIdx === 'number'
+          ? activeMistakeQuestion.selectedIdx
+          : -1,
       category: mistakeCategory,
-      userNotes: mistakeNotes.trim() || undefined,
+      userNotes: mistakeNotes.trim() || '',
       savedAt: Date.now(),
-      testTitle: activeSetName || topicTitle,
-      folderId: q.subCategoryId,
+      testTitle: activeSetName || topicTitle || 'Mock Test',
+      folderId: q.subCategoryId || 'general',
     };
 
     // Save to localStorage

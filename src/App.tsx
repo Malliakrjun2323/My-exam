@@ -793,8 +793,9 @@ export default function App() {
   };
 
   const handleUpdateMistakeNote = (mistakeId: string, notes: string, category: MistakeCategory) => {
+    const cleanNotes = (notes || '').trim();
     const updated = mistakes.map((m) =>
-      m.id === mistakeId ? { ...m, userNotes: notes, category } : m
+      m.id === mistakeId ? { ...m, userNotes: cleanNotes, category } : m
     );
     setMistakes(updated);
     try {
@@ -813,7 +814,15 @@ export default function App() {
   };
 
   const handleSaveMistakeToNotebook = (newItem: MistakeItem) => {
-    const updated = [newItem, ...mistakes.filter((m) => m.questionId !== newItem.questionId)];
+    const safeItem: MistakeItem = {
+      ...newItem,
+      userNotes: (newItem.userNotes || '').trim(),
+      selectedOptionIndex:
+        typeof newItem.selectedOptionIndex === 'number' ? newItem.selectedOptionIndex : -1,
+      folderId: newItem.folderId || 'general',
+      testTitle: newItem.testTitle || 'Mock Test',
+    };
+    const updated = [safeItem, ...mistakes.filter((m) => m.questionId !== safeItem.questionId)];
     setMistakes(updated);
     try {
       localStorage.setItem('examprep_mistake_notebook', JSON.stringify(updated));
@@ -821,7 +830,7 @@ export default function App() {
       console.error(e);
     }
     // Save to Cloud Firestore
-    saveMistakeToFirestore(newItem).catch((err) => {
+    saveMistakeToFirestore(safeItem).catch((err) => {
       console.warn('Firestore mistake save warning:', err);
     });
     setToastMessage('Saved to Cloud Firestore Mistake Notebook (ತಪ್ಪುಗಳ ನೋಟ್ಬುಕ್)!');

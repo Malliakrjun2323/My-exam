@@ -54,6 +54,31 @@ export const batchesCollection = db.collection('exam_batches');
 export const mistakesCollection = db.collection('mistake_notebook');
 
 /**
+ * Recursively removes `undefined` values from objects/arrays so Firestore never throws
+ * "Unsupported field value: undefined" errors.
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === undefined) {
+    return null as any;
+  }
+  if (data === null || typeof data !== 'object') {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data
+      .filter((item) => item !== undefined)
+      .map((item) => sanitizeForFirestore(item)) as any;
+  }
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      result[key] = sanitizeForFirestore(value);
+    }
+  }
+  return result as T;
+}
+
+/**
  * Save a question batch to Firestore
  */
 export async function saveBatchToFirestore(
@@ -70,7 +95,7 @@ export async function saveBatchToFirestore(
       (batch as any).set?.title ||
       'Batch 1';
 
-    const payload = {
+    const rawPayload = {
       id: batch.id,
       folderId: folderId || batch.folderId || 'general',
       subjectId: subjectId || batch.subjectId || 'pyq',
@@ -82,6 +107,7 @@ export async function saveBatchToFirestore(
       createdAt: batch.createdAt || Date.now(),
       updatedAt: Date.now(),
     };
+    const payload = sanitizeForFirestore(rawPayload);
     await batchesCollection.doc(batch.id).set(payload, { merge: true });
   } catch (error) {
     console.error('Error saving batch to Firestore:', error);
@@ -106,7 +132,15 @@ export async function deleteBatchFromFirestore(batchId: string): Promise<void> {
  */
 export async function saveMistakeToFirestore(item: MistakeItem): Promise<void> {
   try {
-    await mistakesCollection.doc(item.id).set(item, { merge: true });
+    const safeItem = {
+      ...item,
+      userNotes: item.userNotes !== undefined ? item.userNotes : '',
+      selectedOptionIndex: typeof item.selectedOptionIndex === 'number' ? item.selectedOptionIndex : -1,
+      folderId: item.folderId || 'general',
+      testTitle: item.testTitle || 'Mock Test',
+    };
+    const sanitized = sanitizeForFirestore(safeItem);
+    await mistakesCollection.doc(item.id).set(sanitized, { merge: true });
   } catch (error) {
     console.error('Error saving mistake to Firestore:', error);
     throw error;
