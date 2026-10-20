@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "ExamBatch": {
+      "title": "ExamBatch",
+      "description": "A set or batch of exam questions belonging to a folder or exam category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the batch"
+        },
+        "folderId": {
+          "type": "string",
+          "description": "Folder or subcategory identifier such as pyq-2025-exams or english_sectional_test"
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Parent subject identifier such as pyq, gk, english"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the batch"
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the batch content"
+        },
+        "questions": {
+          "type": "array",
+          "description": "Array of question objects included in this batch"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Epoch timestamp of batch creation"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Epoch timestamp of last update"
+        }
+      },
+      "required": ["id", "folderId", "name", "questions"]
+    },
+    "MistakeItem": {
+      "title": "MistakeItem",
+      "description": "A question saved to the Mistake Notebook for targeted revision and practice",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the mistake entry"
+        },
+        "questionId": {
+          "type": "string",
+          "description": "ID of the associated question"
+        },
+        "question": {
+          "type": "object",
+          "description": "Complete question data"
+        },
+        "category": {
+          "type": "string",
+          "description": "Categorization of the mistake (concept_gap, silly_mistake, etc.)"
+        },
+        "selectedOptionIndex": {
+          "type": "number",
+          "description": "Option index selected by user during test"
+        },
+        "userNotes": {
+          "type": "string",
+          "description": "Personal reflection notes written by the learner"
+        },
+        "savedAt": {
+          "type": "number",
+          "description": "Epoch timestamp when mistake was recorded"
+        },
+        "folderId": {
+          "type": "string",
+          "description": "Associated folder or exam subcategory"
+        }
+      },
+      "required": ["id", "questionId", "question", "category", "savedAt"]
+    }
+  },
+  "firestore": {
+    "/exam_batches/{batchId}": {
+      "schema": "ExamBatch",
+      "description": "All question batches created or uploaded across folders"
+    },
+    "/mistake_notebook/{mistakeId}": {
+      "schema": "MistakeItem",
+      "description": "Saved mistakes for review and re-test"
+    }
+  }
+}

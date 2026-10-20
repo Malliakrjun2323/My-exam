@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    match /exam_batches/{batchId} {
+      allow read: if true;
+      allow create, update: if isValidId(batchId)
+        && request.resource.data.id is string
+        && request.resource.data.folderId is string
+        && request.resource.data.name is string;
+      allow delete: if isValidId(batchId);
+    }
+
+    match /mistake_notebook/{mistakeId} {
+      allow read: if true;
+      allow create, update: if isValidId(mistakeId)
+        && request.resource.data.id is string
+        && request.resource.data.questionId is string
+        && request.resource.data.category is string;
+      allow delete: if isValidId(mistakeId);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ExamPrep Pro - Testbook Style Study & Mock Test App",
+  "description": "Comprehensive exam preparation mobile and web app featuring subject hierarchies, study notes, interactive quizzes with instant feedback, and previous years' questions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
