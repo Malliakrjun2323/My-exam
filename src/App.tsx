@@ -369,7 +369,7 @@ export default function App() {
           (q.setId === b.id || (!q.setId && b.id.includes('_1')))
       ).length;
 
-      // Extract batch title from batch properties or from questions in this batch
+      // Extract custom batch title from batch properties or from questions in this batch (prioritizing custom setName/title)
       const matchingQ = customQuestions.find(
         (q) =>
           (q.subCategoryId === folderId || (alternateFolderId && q.subCategoryId === alternateFolderId)) &&
@@ -377,18 +377,24 @@ export default function App() {
           (q.setName || (q as any).set?.name || (q as any).set?.title || (q as any).name || (q as any).title)
       );
 
-      const resolvedTitle =
-        b.title ||
-        b.name ||
-        (b as any).setName ||
-        (b as any).set?.name ||
-        (b as any).set?.title ||
-        matchingQ?.setName ||
-        (matchingQ as any)?.set?.name ||
-        (matchingQ as any)?.set?.title ||
-        (matchingQ as any)?.name ||
-        (matchingQ as any)?.title ||
-        `Batch ${idx + 1}`;
+      const titleCandidates = [
+        (b as any).setName,
+        (b as any).set?.name,
+        (b as any).set?.title,
+        (b as any).batchTitle,
+        matchingQ?.setName,
+        (matchingQ as any)?.set?.name,
+        (matchingQ as any)?.set?.title,
+        (matchingQ as any)?.name,
+        (matchingQ as any)?.title,
+        b.title,
+        b.name,
+      ];
+      const validCustomTitle = titleCandidates.find(
+        (c) => typeof c === 'string' && c.trim() && c.trim() !== 'Question Batch' && c.trim() !== 'Custom Question Batch'
+      );
+      const fallbackTitle = (b.title && b.title.trim()) || (b.name && b.name.trim()) || `Batch ${idx + 1}`;
+      const resolvedTitle = validCustomTitle ? validCustomTitle.trim() : fallbackTitle;
 
       return {
         ...b,
@@ -1271,13 +1277,23 @@ export default function App() {
                     {activeFolderBatches.map((batch, idx) => {
                       // Custom Batch Title entered during upload (e.g. set.name, set.title, setName, or title) with fallback
                       const displayTitle =
-                        batch.title ||
-                        batch.name ||
-                        (batch as any).setName ||
-                        (batch as any).set?.name ||
-                        (batch as any).set?.title ||
-                        (batch as any).batchTitle ||
-                        `Batch ${idx + 1}`;
+                        (batch.title && batch.title.trim() && batch.title.trim() !== 'Question Batch' && batch.title.trim() !== 'Custom Question Batch')
+                          ? batch.title.trim()
+                          : (batch.name && batch.name.trim() && batch.name.trim() !== 'Question Batch' && batch.name.trim() !== 'Custom Question Batch')
+                          ? batch.name.trim()
+                          : ((batch as any).setName && typeof (batch as any).setName === 'string' && (batch as any).setName.trim())
+                          ? (batch as any).setName.trim()
+                          : ((batch as any).set?.name && typeof (batch as any).set.name === 'string' && (batch as any).set.name.trim())
+                          ? (batch as any).set.name.trim()
+                          : ((batch as any).set?.title && typeof (batch as any).set.title === 'string' && (batch as any).set.title.trim())
+                          ? (batch as any).set.title.trim()
+                          : ((batch as any).batchTitle && typeof (batch as any).batchTitle === 'string' && (batch as any).batchTitle.trim())
+                          ? (batch as any).batchTitle.trim()
+                          : (batch.title && batch.title.trim())
+                          ? batch.title.trim()
+                          : (batch.name && batch.name.trim())
+                          ? batch.name.trim()
+                          : `Batch ${idx + 1}`;
 
                       return (
                         <div

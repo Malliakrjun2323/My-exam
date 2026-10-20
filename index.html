@@ -14,12 +14,47 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="TestPrep" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- PWA Web App Manifest (Direct Data URI for Standalone Offline & Installability) -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22id%22%3A%22%2F%22%2C%22name%22%3A%22ExamPrep%20Pro%20-%20CBT%20Mock%20Test%20Engine%20%26%20PYQs%22%2C%22short_name%22%3A%22ExamPrep%22%2C%22description%22%3A%22Comprehensive%20bilingual%20CBT%20exam%20practice%20with%20live%20timer%2C%20scorecard%20and%20cloud%20persistence%22%2C%22start_url%22%3A%22%2F%22%2C%22scope%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22background_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%253E%253Crect%20width%3D'512'%20height%3D'512'%20rx%3D'100'%20fill%3D'%25234f46e5'%2F%253E%253Cpath%20d%3D'M256%20120%20L380%20200%20L256%20280%20L132%20200%20Z'%20fill%3D'%2523ffffff'%2F%253E%253Cpath%20d%3D'M170%20230%20L170%20310%20C170%20350%20342%20350%20342%20310%20L342%20230'%20fill%3D'none'%20stroke%3D'%2523ffffff'%20stroke-width%3D'24'%20stroke-linecap%3D'round'%2F%253E%253Cpath%20d%3D'M380%20200%20L380%20290'%20stroke%3D'%2523fbbf24'%20stroke-width%3D'16'%20stroke-linecap%3D'round'%2F%253E%253Ccircle%20cx%3D'380'%20cy%3D'300'%20r%3D'14'%20fill%3D'%2523fbbf24'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%234f46e5'/%3E%3Cpath d='M256 120 L380 200 L256 280 L132 200 Z' fill='%23ffffff'/%3E%3C/svg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%234f46e5'/%3E%3Cpath d='M256 120 L380 200 L256 280 L132 200 Z' fill='%23ffffff'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Inline Service Worker Registration in Head for Direct Browser Installability -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          const swCode = `
+            const CACHE_NAME = 'examprep-pwa-v2';
+            self.addEventListener('install', (event) => {
+              self.skipWaiting();
+            });
+            self.addEventListener('activate', (event) => {
+              event.waitUntil(self.clients.claim());
+            });
+            self.addEventListener('fetch', (event) => {
+              if (event.request.method !== 'GET') return;
+              event.respondWith(
+                fetch(event.request).catch(() => caches.match(event.request))
+              );
+            });
+          `;
+          try {
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl)
+              .then((reg) => console.log('PWA Service Worker registered:', reg.scope))
+              .catch(() => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+              });
+          } catch (e) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          }
+        });
+      }
+    </script>
   </head>
   <body>
     <!-- Firebase App & Firestore Scripts for Offline & Cloud Persistence -->
@@ -27,15 +62,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((reg) => console.log('PWA Service Worker registered:', reg.scope))
-            .catch((err) => console.log('Service Worker registration failed:', err));
-        });
-      }
-    </script>
   </body>
 </html>
 

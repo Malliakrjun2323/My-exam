@@ -74,7 +74,7 @@ export const MISTAKE_CATEGORY_LABELS: Record<MistakeCategory, { label: string; l
 export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
   isOpen,
   onClose,
-  mistakes,
+  mistakes = [],
   onRemoveMistake,
   onUpdateMistakeNote,
   onStartReTest,
@@ -87,7 +87,9 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
 
   if (!isOpen) return null;
 
-  const filteredMistakes = mistakes.filter((m) => {
+  const safeMistakes = Array.isArray(mistakes) ? mistakes.filter(Boolean) : [];
+  const filteredMistakes = safeMistakes.filter((m) => {
+    if (!m) return false;
     if (selectedFilter === 'all') return true;
     return m.category === selectedFilter;
   });
@@ -127,7 +129,7 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
                   ತಪ್ಪುಗಳ ನೋಟ್ಬುಕ್ (Mistake Notebook)
                 </h2>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                  {mistakes.length} Saved
+                  {safeMistakes.length} Saved
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -156,10 +158,10 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
               }`}
             >
-              All ({mistakes.length})
+              All ({safeMistakes.length})
             </button>
-            {Object.entries(MISTAKE_CATEGORY_LABELS).map(([catKey, catVal]) => {
-              const count = mistakes.filter((m) => m.category === catKey).length;
+            {Object.entries(MISTAKE_CATEGORY_LABELS || {}).map(([catKey, catVal]) => {
+              const count = safeMistakes.filter((m) => m && m.category === catKey).length;
               if (count === 0) return null;
               const isSelected = selectedFilter === catKey;
               return (
@@ -181,7 +183,32 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
           {onStartReTest && filteredMistakes.length > 0 && (
             <button
               onClick={() => {
-                onStartReTest(filteredMistakes.map((m) => m.question));
+                const normalizedQuestions: Question[] = filteredMistakes.map((m, mIdx) => {
+                  const raw = m.question;
+                  const isObj = raw && typeof raw === 'object';
+                  const rawOpts = isObj ? raw.options : (m as any).options;
+                  const opts = Array.isArray(rawOpts) && rawOpts.length ? rawOpts : ['Option A', 'Option B', 'Option C', 'Option D'];
+
+                  return {
+                    id: m.questionId || (isObj ? raw.id : undefined) || `mistake_q_${m.id}_${mIdx}`,
+                    subjectId: (isObj ? raw.subjectId : undefined) || (m as any).subjectId || 'pyq',
+                    subCategoryId: (isObj ? raw.subCategoryId : undefined) || (m as any).subCategoryId || 'pyq-2025-exams',
+                    topicId: (isObj ? raw.topicId : undefined) || (m as any).topicId || 'general',
+                    question: isObj ? raw.question : (typeof raw === 'string' ? raw : (m as any).question || 'Question'),
+                    questionKn: isObj ? raw.questionKn : (m as any).questionKn,
+                    options: opts,
+                    optionsKn: (isObj ? raw.optionsKn : undefined) || (m as any).optionsKn,
+                    correctAnswerIndex: isObj && typeof raw.correctAnswerIndex === 'number'
+                      ? raw.correctAnswerIndex
+                      : (typeof (m as any).correctAnswerIndex === 'number' ? (m as any).correctAnswerIndex : 0),
+                    explanation: isObj ? raw.explanation : (m as any).explanation || 'Solution provided.',
+                    explanationKn: isObj ? raw.explanationKn : (m as any).explanationKn,
+                    difficulty: isObj ? raw.difficulty : (m as any).difficulty || 'Medium',
+                    examTag: isObj ? raw.examTag : (m as any).examTag || 'Mistake Practice',
+                    year: isObj ? raw.year : (m as any).year || 2025,
+                  };
+                });
+                onStartReTest(normalizedQuestions);
                 onClose();
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 shrink-0"
@@ -208,8 +235,34 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
             </div>
           ) : (
             filteredMistakes.map((item, idx) => {
-              const catMeta = MISTAKE_CATEGORY_LABELS[item.category] || MISTAKE_CATEGORY_LABELS.concept_gap;
-              const q = item.question;
+              if (!item) return null;
+              const catMeta = (item.category && MISTAKE_CATEGORY_LABELS[item.category]) || MISTAKE_CATEGORY_LABELS.concept_gap || {
+                label: 'Concept Gap',
+                labelKn: 'ಪರಿಕಲ್ಪನಾ ದೋಷ',
+                color: 'text-rose-700',
+                bg: 'bg-rose-50',
+                border: 'border-rose-200',
+              };
+              const rawQ = item.question;
+              const isObj = rawQ && typeof rawQ === 'object';
+
+              // Robust extraction handling both nested Question object and flat Firestore item
+              const qKn = isObj ? rawQ.questionKn : (item as any).questionKn;
+              const qEn = isObj ? rawQ.question : (typeof rawQ === 'string' ? rawQ : (item as any).question);
+              const rawOpts = isObj ? rawQ.options : (item as any).options;
+              const options: string[] = Array.isArray(rawOpts) && rawOpts.length ? rawOpts : ['Option A', 'Option B', 'Option C', 'Option D'];
+              const rawOptsKn = isObj ? rawQ.optionsKn : (item as any).optionsKn;
+              const optionsKn: string[] | undefined = Array.isArray(rawOptsKn) ? rawOptsKn : undefined;
+
+              const correctAnsIdx = isObj && typeof rawQ.correctAnswerIndex === 'number'
+                ? rawQ.correctAnswerIndex
+                : typeof (item as any).correctAnswerIndex === 'number'
+                ? (item as any).correctAnswerIndex
+                : 0;
+
+              const explanationEn = isObj ? rawQ.explanation : (item as any).explanation;
+              const explanationKn = isObj ? rawQ.explanationKn : (item as any).explanationKn;
+
               const isExpOpen = expandedExplanation[item.id] ?? false;
               const isEditing = editingId === item.id;
 
@@ -256,24 +309,24 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
 
                   {/* Question Text */}
                   <div className="space-y-1.5">
-                    {q.questionKn && (
+                    {qKn && (
                       <p className="text-sm sm:text-base font-semibold text-slate-900 leading-snug">
-                        {q.questionKn}
+                        {qKn}
                       </p>
                     )}
-                    {q.question && (
+                    {qEn && (
                       <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                        {q.question}
+                        {qEn}
                       </p>
                     )}
                   </div>
 
                   {/* Options & Answers */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    {q.options.map((opt, optIdx) => {
-                      const isCorrect = optIdx === q.correctAnswerIndex;
+                    {options.map((opt, optIdx) => {
+                      const isCorrect = optIdx === correctAnsIdx;
                       const wasSelected = optIdx === item.selectedOptionIndex;
-                      const optKn = q.optionsKn?.[optIdx];
+                      const optKn = optionsKn?.[optIdx];
 
                       return (
                         <div
@@ -371,14 +424,16 @@ export const MistakeNotebookModal: React.FC<MistakeNotebookModalProps> = ({
 
                     {isExpOpen && (
                       <div className="mt-2.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs leading-relaxed text-slate-800 animate-in fade-in">
-                        {q.explanationKn && (
+                        {explanationKn && (
                           <div className="whitespace-pre-line text-slate-900 font-medium pb-2 border-b border-slate-200">
-                            {q.explanationKn}
+                            {explanationKn}
                           </div>
                         )}
-                        <div className="whitespace-pre-line text-slate-700 font-normal">
-                          {q.explanation}
-                        </div>
+                        {explanationEn && (
+                          <div className="whitespace-pre-line text-slate-700 font-normal">
+                            {explanationEn}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

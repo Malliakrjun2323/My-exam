@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExamPrep Pro - Testbook Style CBT Mock Test Engine & PYQs</title>
+  <meta name="description" content="Comprehensive bilingual CBT exam preparation with live timer, question palette, analytics, and cloud sync.">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ExamPrep Pro">
+
+  <!-- 1. PWA Web App Manifest (Inline Data URI for Standalone Installability on GitHub Pages) -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22id%22%3A%22%2F%22%2C%22name%22%3A%22ExamPrep%20Pro%20-%20CBT%20Mock%20Test%20Engine%22%2C%22short_name%22%3A%22ExamPrep%22%2C%22description%22%3A%22Comprehensive%20Bilingual%20CBT%20Mock%20Tests%20and%20PYQs%20with%20Cloud%20Persistence%22%2C%22start_url%22%3A%22.%2F%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22background_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%253E%253Crect%20width%3D'512'%20height%3D'512'%20rx%3D'100'%20fill%3D'%25234f46e5'%2F%253E%253Cpath%20d%3D'M256%20120%20L380%20200%20L256%20280%20L132%20200%20Z'%20fill%3D'%2523ffffff'%2F%253E%253Cpath%20d%3D'M170%20230%20L170%20310%20C170%20350%20342%20350%20342%20310%20L342%20230'%20fill%3D'none'%20stroke%3D'%2523ffffff'%20stroke-width%3D'24'%20stroke-linecap%3D'round'%2F%253E%253Cpath%20d%3D'M380%20200%20L380%20290'%20stroke%3D'%2523fbbf24'%20stroke-width%3D'16'%20stroke-linecap%3D'round'%2F%253E%253Ccircle%20cx%3D'380'%20cy%3D'300'%20r%3D'14'%20fill%3D'%2523fbbf24'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%234f46e5'/%3E%3Cpath d='M256 120 L380 200 L256 280 L132 200 Z' fill='%23ffffff'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: English & Kannada -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Kannada"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            kannada: ['"Noto Sans Kannada"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Inline Service Worker Registration in Head for Instant PWA Installation -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swBlob = new Blob([`
+          const CACHE_NAME = 'examprep-pwa-v3';
+          self.addEventListener('install', e => self.skipWaiting());
+          self.addEventListener('activate', e => event.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', e => {
+            if (e.request.method !== 'GET') return;
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+          });
+        `], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      });
+    }
+  </script>
+
+  <!-- Firebase App & Firestore Scripts (Compat Version for Single-File Execution) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Lucide Icons Standalone CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+  <!-- Top Application Navigation Bar -->
+  <header class="bg-slate-900 text-white sticky top-0 z-40 border-b border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigateToHome()">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-md">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-base sm:text-lg tracking-tight">ExamPrep Pro</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">Testbook CBT</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium">Bilingual PYQs & Real-time CBT Mocks</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Bookmarked Questions Button -->
+        <button onclick="openBookmarksView()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-semibold transition-all">
+          <i data-lucide="bookmark" class="w-4 h-4 text-amber-400"></i>
+          <span class="hidden md:inline">Bookmarks</span>
+          <span id="bookmarkBadgeCount" class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[11px] flex items-center justify-center font-bold font-mono">0</span>
+        </button>
+
+        <!-- Mistake Notebook Button -->
+        <button onclick="openMistakeNotebook()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 text-xs font-semibold transition-all">
+          <i data-lucide="book-open" class="w-4 h-4 text-rose-400"></i>
+          <span class="hidden md:inline">Mistakes</span>
+          <span id="mistakeBadgeCount" class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30 text-[11px] flex items-center justify-center font-bold font-mono">0</span>
+        </button>
+
+        <!-- Install PWA Button -->
+        <button id="pwaInstallBtn" onclick="triggerPWAInstall()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Install App</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dynamic Application Container -->
+  <main id="appRoot" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- View content rendered via JavaScript -->
+  </main>
+
+  <!-- Modals Container -->
+  <div id="modalContainer"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs sm:text-sm font-semibold flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- APPLICATION LOGIC, DATA, FIREBASE & ANALYTICS -->
+  <script>
+    /* ==========================================================================
+       1. FIREBASE INITIALIZATION & CLOUD PERSISTENCE
+       ========================================================================== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZUg0QkyXjFGRmX8Gm...",
+      authDomain: "exam-e8e8d.firebaseapp.com",
+      projectId: "exam-e8e8d",
+      storageBucket: "exam-e8e8d.firebasestorage.app",
+      messagingSenderId: "793391772218",
+      appId: "1:793391772218:web:9693213032",
+      measurementId: "G-2KD9LEDE56"
+    };
+
+    let db = null;
+    try {
+      if (typeof firebase !== 'undefined') {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+          console.warn("Firestore offline persistence notice:", err.code);
+        });
+      }
+    } catch (e) {
+      console.warn("Firebase fallback mode:", e);
+    }
+
+    /* ==========================================================================
+       2. EXAM SUBJECT HIERARCHY DATA
+       ========================================================================== */
+    const examSubjects = [
+      {
+        id: "pyq",
+        name: "🎓 PYQs (Previous Years' Questions / ಹಿಂದಿನ ಪ್ರಶ್ನೆಗಳು)",
+        shortName: "PYQs",
+        tagline: "Official TCS & SSC Previous Years' Papers for 2025 Targets",
+        description: "Official real exam questions from 2024, 2023, 2022 & 2021 SSC, Railway & State exams with deep bilingual analysis.",
+        iconName: "graduation-cap",
+        subCategories: [
+          { id: "pyq-2025-exams", name: "Folder 01: 2025 Exams (Target Batches)", description: "Latest 2025 target practice sets, trending TCS question sets & high-yield bilingual mock questions.", iconName: "sparkles", badge: "2025 Target", topic: "Current Exam Trends" },
+          { id: "pyq-ssc-cgl", name: "Folder 02: SSC CGL (Tier 1 & Tier 2)", description: "Staff Selection Commission Combined Graduate Level official solved papers with step-by-step solutions.", iconName: "award", badge: "Grad Level", topic: "SSC CGL Solved Papers" },
+          { id: "pyq-phase-exams", name: "Folder 03: Phase Selection Posts", description: "Matriculation, Higher Secondary & Graduation level Selection Post official papers.", iconName: "file-check", badge: "Phase XII", topic: "Selection Posts" },
+          { id: "pyq-ssc-steno", name: "Folder 04: SSC Stenographer (Grade C & D)", description: "General Awareness, Reasoning & English Language specialized question papers.", iconName: "file-text", badge: "Steno C&D", topic: "Stenographer Exams" }
+        ]
+      },
+      {
+        id: "gk",
+        name: "🌐 General Knowledge (GK & GS / ಸಾಮಾನ್ಯ ಜ್ಞಾನ)",
+        shortName: "GK & GS",
+        tagline: "Indian Polity, Modern History, Geography, General Science & Static GK",
+        description: "Complete general awareness covering Constitution, Science, History, Art & Culture with high-yield bilingual summaries.",
+        iconName: "globe",
+        subCategories: [
+          { id: "gk-polity", name: "Indian Constitution & Polity (ಭಾರತೀಯ ಸಂವಿಧಾನ)", description: "Articles, Amendments, Fundamental Rights, Parliament & Judiciary.", iconName: "landmark", badge: "Core Topic", topic: "Indian Polity" },
+          { id: "gk-history", name: "History of India (ಭಾರತದ ಇತಿಹಾಸ)", description: "Ancient, Medieval & Indian National Movement (ಸ್ವಾತಂತ್ರ್ಯ ಚಳವಳಿ).", iconName: "history", badge: "High Yield", topic: "Indian History" },
+          { id: "gk-geography", name: "Geography & Environment (ಭೂಗೋಳಶಾಸ್ತ್ರ)", description: "Rivers, Climate, Soil, National Parks & Solar System.", iconName: "map-pin", badge: "Key Focus", topic: "Geography" },
+          { id: "gk-science", name: "General Science (ಸಾಮಾನ್ಯ ವಿಜ್ಞಾನ)", description: "Physics, Chemistry & Biology NCERT concepts for competitive exams.", iconName: "flask-conical", badge: "NCERT Based", topic: "General Science" }
+        ]
+      },
+      {
+        id: "english",
+        name: "📖 English Comprehension (Contains Sectional Tests)",
+        shortName: "English",
+        tagline: "Grammar Rules, Vocabulary, Idioms, Cloze Test & Sectional Mocks",
+        description: "Comprehensive English preparation with Error Spotting, Sentence Improvement, Reading Comprehension & Sectional Mocks.",
+        iconName: "book-open",
+        subCategories: [
+          { id: "eng-grammar", name: "Grammar & Error Detection (ವ್ಯಾಕರಣ)", description: "Subject-Verb agreement, Tenses, Prepositions & Active-Passive voice.", iconName: "check-check", badge: "Error Spotting", topic: "English Grammar" },
+          { id: "eng-vocab", name: "Vocabulary, Synonyms & Antonyms (ಶಬ್ದಕೋಶ)", description: "One Word Substitutions, Idioms & Phrases, Spelling rules.", iconName: "spell-check", badge: "Daily Vocab", topic: "Vocabulary" },
+          { id: "eng-comprehension", name: "Cloze Test & Reading Passage (ಗ್ರಹಿಕೆ)", description: "Paragraph completion, context clues & Reading Comprehension tests.", iconName: "file-text", badge: "Reading", topic: "Reading Comprehension" },
+          { id: "eng-sectional", name: "Full English Sectional Mock Tests (25 Qs)", description: "Complete timed English sectional tests with detailed solutions.", iconName: "timer", badge: "Full Sectional", topic: "English Sectional Mock" }
+        ]
+      },
+      {
+        id: "quant",
+        name: "🔢 Quantitative Aptitude (ಗಣಿತಶಾಸ್ತ್ರ)",
+        shortName: "Quant",
+        tagline: "Arithmetic, Algebra, Geometry, Mensuration & Number System",
+        description: "Concept shortcuts, calculation tricks and formula-based chapter tests for SSC, Railways & State exams.",
+        iconName: "calculator",
+        subCategories: [
+          { id: "quant-arithmetic", name: "Arithmetic (ಅಂಕಗಣಿತ)", description: "Percentage, Profit & Loss, Simple & Compound Interest, Ratio & Proportion.", iconName: "percent", badge: "Core Arithmetic", topic: "Arithmetic Math" },
+          { id: "quant-algebra", name: "Algebra & Number System (ಬೀಜಗಣಿತ)", description: "Surds & Indices, Identities, LCM-HCF, Divisibility rules.", iconName: "binary", badge: "Concepts", topic: "Algebra & Numbers" },
+          { id: "quant-geometry", name: "Geometry & Mensuration (ರೇಖಾಗಣಿತ & ಕ್ಷೇತ್ರಗಣಿತ)", description: "Triangles, Circles, 2D/3D shapes, Volume & Surface Areas.", iconName: "shapes", badge: "Formulas", topic: "Geometry & Mensuration" }
+        ]
+      },
+      {
+        id: "reasoning",
+        name: "🧠 General Intelligence & Reasoning (ತಾರ್ಕಿಕ ಸಾಮರ್ಥ್ಯ)",
+        shortName: "Reasoning",
+        tagline: "Verbal & Non-Verbal Logic, Syllogisms, Coding-Decoding & Puzzles",
+        description: "Analytical reasoning, Direction Sense, Blood Relations, Analogy and visual patterns practice.",
+        iconName: "brain",
+        subCategories: [
+          { id: "reas-verbal", name: "Verbal Reasoning (ಮೌಖಿಕ ತರ್ಕ)", description: "Coding-Decoding, Series completion, Analogy & Classification.", iconName: "cpu", badge: "High Speed", topic: "Verbal Reasoning" },
+          { id: "reas-logic", name: "Logical Deduction & Syllogism (ತಾರ್ಕಿಕ ನಿರ್ಣಯ)", description: "Statements and Conclusions, Venn Diagrams & Blood Relations.", iconName: "git-commit", badge: "Concepts", topic: "Logical Syllogism" }
+        ]
+      }
+    ];
+
+    /* ==========================================================================
+       3. SEED QUESTIONS (Bilingual English & Kannada)
+       ========================================================================== */
+    const initialSeedQuestions = [
+      {
+        id: "q_seed_1",
+        subjectId: "pyq",
+        subCategoryId: "pyq-2025-exams",
+        setId: "batch_2025_target_1",
+        setName: "2025 Target Exam - High Yield General Awareness",
+        topic: "Indian Polity",
+        question: "Which Constitutional Amendment Act lowered the voting age in India from 21 to 18 years?",
+        questionKn: "ಭಾರತದಲ್ಲಿ ಮತದಾನದ ಅರ್ಹತಾ ವಯಸ್ಸನ್ನು 21 ರಿಂದ 18 ವರ್ಷಕ್ಕೆ ಇಳಿಸಿದ ಸಾಂವಿಧಾನಿಕ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆ ಯಾವುದು?",
+        options: ["42nd Amendment Act", "61st Amendment Act", "73rd Amendment Act", "86th Amendment Act"],
+        optionsKn: ["42 ನೇ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆ", "61 ನೇ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆ", "73 ನೇ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆ", "86 ನೇ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆ"],
+        correctAnswerIndex: 1,
+        explanation: "The 61st Constitutional Amendment Act, 1988 amended Article 326 of the Constitution to lower the voting age from 21 to 18 years. It came into force on March 28, 1989 under the Rajiv Gandhi government.",
+        explanationKn: "1988 ರ 61 ನೇ ಸಾಂವಿಧಾನಿಕ ತಿದ್ದುಪಡಿ ಕಾಯ್ದೆಯು ಸಂವಿಧಾನದ 326 ನೇ ವಿಧಿಯನ್ನು ತಿದ್ದುಪಡಿ ಮಾಡುವ ಮೂಲಕ ಮತದಾನದ ವಯಸ್ಸನ್ನು 21 ರಿಂದ 18 ಕ್ಕೆ ಇಳಿಸಿತು. ಇದು ರಾಜೀವ್ ಗಾಂಧಿಯವರ ಅವಧಿಯಲ್ಲಿ 1989 ರ ಮಾರ್ಚ್ 28 ರಂದು ಜಾರಿಗೆ ಬಂದಿತು.",
+        examTag: "SSC Target 2025",
+        difficulty: "Medium",
+        year: 2025
+      },
+      {
+        id: "q_seed_2",
+        subjectId: "pyq",
+        subCategoryId: "pyq-ssc-cgl",
+        setId: "batch_cgl_tier1_mock1",
+        setName: "SSC CGL Tier 1 Solved Paper Mock 1",
+        topic: "Indian History",
+        question: "Who was the Viceroy of India when the Indian National Congress was founded in December 1885?",
+        questionKn: "ಡಿಸೆಂಬರ್ 1885 ರಲ್ಲಿ ಭಾರತೀಯ ರಾಷ್ಟ್ರೀಯ ಕಾಂಗ್ರೆಸ್ ಸ್ಥಾಪನೆಯಾದಾಗ ಭಾರತದ ವೈಸ್‌ರಾಯ್ ಯಾರಾಗಿದ್ದರು?",
+        options: ["Lord Ripon", "Lord Dufferin", "Lord Curzon", "Lord Lansdowne"],
+        optionsKn: ["ಲಾರ್ಡ್ ರಿಪ್ಪನ್", "ಲಾರ್ಡ್ ಡಫರಿನ್", "ಲಾರ್ಡ್ ಕರ್ಜನ್", "ಲಾರ್ಡ್ ಲ್ಯಾನ್ಸ್‌ಡೌನ್"],
+        correctAnswerIndex: 1,
+        explanation: "Lord Dufferin served as the Viceroy of India from 1884 to 1888. The Indian National Congress was founded in Bombay in December 1885 by Allan Octavian Hume.",
+        explanationKn: "ಲಾರ್ಡ್ ಡಫರಿನ್ ಅವರು 1884 ರಿಂದ 1888 ರವರೆಗೆ ಭಾರತದ ವೈಸ್‌ರಾಯ್ ಆಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದರು. ಡಿಸೆಂಬರ್ 1885 ರಲ್ಲಿ ಬಾಂಬೆಯಲ್ಲಿ ಎ.ಒ. ಹ್ಯೂಮ್ ಅವರು ಭಾರತೀಯ ರಾಷ್ಟ್ರೀಯ ಕಾಂಗ್ರೆಸ್ ಅನ್ನು ಸ್ಥಾಪಿಸಿದರು.",
+        examTag: "SSC CGL Tier 1",
+        difficulty: "Medium",
+        year: 2024
+      },
+      {
+        id: "q_seed_3",
+        subjectId: "gk",
+        subCategoryId: "gk-polity",
+        setId: "batch_polity_preamble",
+        setName: "ಸಂವಿಧಾನದ ಪ್ರಮುಖ ವಿಧಿಗಳು ಮತ್ತು ಪೀಠಿಕೆ (Polity Batch 1)",
+        topic: "Indian Polity",
+        question: "Which Article of the Indian Constitution empowers the Supreme Court to issue writs for the enforcement of Fundamental Rights?",
+        questionKn: "ಮೂಲಭೂತ ಹಕ್ಕುಗಳ ಜಾರಿಗಾಗಿ ರಿಟ್‌ಗಳನ್ನು ಹೊರಡಿಸಲು ಸುಪ್ರೀಂ ಕೋರ್ಟ್‌ಗೆ ಅಧಿಕಾರ ನೀಡುವ ಭಾರತೀಯ ಸಂವಿಧಾನದ ವಿಧಿ ಯಾವುದು?",
+        options: ["Article 32", "Article 226", "Article 21", "Article 143"],
+        optionsKn: ["32 ನೇ ವಿಧಿ", "226 ನೇ ವಿಧಿ", "21 ನೇ ವಿಧಿ", "143 ನೇ ವಿಧಿ"],
+        correctAnswerIndex: 0,
+        explanation: "Article 32 gives citizens the right to move the Supreme Court directly for the enforcement of Fundamental Rights. Dr. B.R. Ambedkar called Article 32 the 'Heart and Soul of the Constitution'.",
+        explanationKn: "32 ನೇ ವಿಧಿಯು ಮೂಲಭೂತ ಹಕ್ಕುಗಳ ರಕ್ಷಣೆಗಾಗಿ ನೇರವಾಗಿ ಸುಪ್ರೀಂ ಕೋರ್ಟ್‌ಗೆ ಮನವಿ ಮಾಡಲು ನಾಗರಿಕರಿಗೆ ಹಕ್ಕನ್ನು ನೀಡುತ್ತದೆ. ಡಾ. ಬಿ.ಆರ್. ಅಂಬೇಡ್ಕರ್ ಅವರು 32 ನೇ ವಿಧಿಯನ್ನು 'ಸಂವಿಧಾನದ ಹೃದಯ ಮತ್ತು ಆತ್ಮ' ಎಂದು ಕರೆದಿದ್ದಾರೆ.",
+        examTag: "Polity Core",
+        difficulty: "Easy",
+        year: 2024
+      },
+      {
+        id: "q_seed_4",
+        subjectId: "english",
+        subCategoryId: "eng-grammar",
+        setId: "batch_eng_error_1",
+        setName: "Error Spotting & Subject-Verb Agreement Test 1",
+        topic: "English Grammar",
+        question: "Find the error: 'Neither the teacher (A) / nor the students (B) / was present (C) / in the class (D).'",
+        questionKn: "ದೋಷವನ್ನು ಗುರುತಿಸಿ: 'Neither the teacher (A) / nor the students (B) / was present (C) / in the class (D).'",
+        options: ["Neither the teacher (A)", "nor the students (B)", "was present (C)", "in the class (D)"],
+        optionsKn: ["Neither the teacher (A)", "nor the students (B)", "was present (C)", "in the class (D)"],
+        correctAnswerIndex: 2,
+        explanation: "When two subjects are joined by 'neither... nor', the verb must agree with the nearer subject. Here 'the students' is plural, so 'were present' should be used instead of 'was present'.",
+        explanationKn: "'neither... nor' ನಿಂದ ಎರಡು ನಾಮಪದಗಳು ಜೋಡಿಸಲ್ಪಟ್ಟಾಗ, ಕ್ರಿಯಾಪದವು ಹತ್ತಿರದ ನಾಮಪದಕ್ಕೆ ಅನುಗುಣವಾಗಿರಬೇಕು. ಇಲ್ಲಿ 'the students' ಬಹುವಚನವಾಗಿರುವುದರಿಂದ 'were present' ಎಂದಾಗಬೇಕು.",
+        examTag: "SSC CGL English",
+        difficulty: "Medium",
+        year: 2024
+      }
+    ];
+
+    /* ==========================================================================
+       4. APPLICATION STATE & LOCAL PERSISTENCE
+       ========================================================================== */
+    let currentView = 'home'; // 'home' | 'pyq_subfolders' | 'subject' | 'folder' | 'cbt_quiz' | 'quiz_result' | 'bookmarks_view'
+    let currentSubjectId = null;
+    let currentFolderId = null;
+    let currentBatchId = null;
+    let currentBatchTitle = "";
+
+    let storedQuestions = [];
+    let folderBatches = {};
+    let mistakeNotebook = [];
+    let bookmarkedQuestionIds = new Set();
+    let userLang = 'dual';
+
+    function loadLocalData() {
+      try {
+        const qRaw = localStorage.getItem('examprep_custom_questions');
+        storedQuestions = qRaw ? JSON.parse(qRaw) : [...initialSeedQuestions];
+
+        const mRaw = localStorage.getItem('examprep_mistake_notebook');
+        mistakeNotebook = mRaw ? JSON.parse(mRaw) : [];
+
+        const bRaw = localStorage.getItem('examprep_bookmarks');
+        bookmarkedQuestionIds = new Set(bRaw ? JSON.parse(bRaw) : []);
+
+        rebuildBatchesFromQuestions();
+      } catch (e) {
+        storedQuestions = [...initialSeedQuestions];
+        rebuildBatchesFromQuestions();
+      }
+    }
+
+    function saveLocalData() {
+      try {
+        localStorage.setItem('examprep_custom_questions', JSON.stringify(storedQuestions));
+        localStorage.setItem('examprep_mistake_notebook', JSON.stringify(mistakeNotebook));
+        localStorage.setItem('examprep_bookmarks', JSON.stringify(Array.from(bookmarkedQuestionIds)));
+      } catch (e) {
+        console.error("Local save error:", e);
+      }
+    }
+
+    function rebuildBatchesFromQuestions() {
+      folderBatches = {};
+      storedQuestions.forEach((q, idx) => {
+        const fId = q.subCategoryId;
+        if (!fId) return;
+        const bId = q.setId || `batch_${fId}_1`;
+        const bTitle = q.setName || q.set?.name || q.set?.title || q.title || `Batch ${idx + 1}`;
+
+        if (!folderBatches[fId]) folderBatches[fId] = [];
+        let existing = folderBatches[fId].find(b => b.id === bId);
+        if (!existing) {
+          folderBatches[fId].push({
+            id: bId,
+            title: bTitle,
+            name: bTitle,
+            questionCount: 1,
+            folderId: fId
+          });
+        } else {
+          existing.questionCount++;
+          if (bTitle && (!existing.title || existing.title === 'Batch 1')) {
+            existing.title = bTitle;
+            existing.name = bTitle;
+          }
+        }
+      });
+      updateBadges();
+    }
+
+    function updateBadges() {
+      const elM = document.getElementById('mistakeBadgeCount');
+      if (elM) elM.innerText = mistakeNotebook.length;
+      const elB = document.getElementById('bookmarkBadgeCount');
+      if (elB) elB.innerText = bookmarkedQuestionIds.size;
+    }
+
+    /* ==========================================================================
+       5. FIREBASE TWO-WAY CLOUD SYNC
+       ========================================================================== */
+    function initFirebaseSync() {
+      if (!db) return;
+
+      db.collection('exam_batches').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.questions && Array.isArray(data.questions)) {
+              data.questions.forEach(q => {
+                if (!storedQuestions.some(sq => sq.id === q.id)) {
+                  storedQuestions.push(q);
+                }
+              });
+            }
+          });
+          rebuildBatchesFromQuestions();
+          saveLocalData();
+          if (currentView === 'folder') renderFolderBatchesView(document.getElementById('appRoot'));
+        }
+      }, err => console.warn("Firestore batches notice:", err));
+
+      db.collection('mistake_notebook').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          const list = [];
+          snapshot.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+          mistakeNotebook = list;
+          saveLocalData();
+          updateBadges();
+        }
+      }, err => console.warn("Firestore mistakes notice:", err));
+    }
+
+    async function syncBatchToFirestore(batchObj, questionsArr) {
+      if (!db) return;
+      try {
+        await db.collection('exam_batches').doc(batchObj.id).set({
+          id: batchObj.id,
+          title: batchObj.title,
+          folderId: batchObj.folderId,
+          questionCount: questionsArr.length,
+          questions: questionsArr,
+          updatedAt: Date.now()
+        }, { merge: true });
+        showToast("Batch synced to Cloud Firestore!");
+      } catch (e) {
+        console.warn("Firestore save warning:", e);
+      }
+    }
+
+    async function deleteBatchFromFirestore(batchId) {
+      if (!db) return;
+      try {
+        await db.collection('exam_batches').doc(batchId).delete();
+      } catch (e) {
+        console.warn("Firestore delete warning:", e);
+      }
+    }
+
+    /* ==========================================================================
+       6. NAVIGATION & VIEW CONTROLLER
+       ========================================================================== */
+    function navigateToHome() {
+      currentView = 'home';
+      currentSubjectId = null;
+      currentFolderId = null;
+      renderApp();
+    }
+
+    function openSubject(subjectId) {
+      if (subjectId === 'pyq') {
+        currentView = 'pyq_subfolders';
+        currentSubjectId = 'pyq';
+      } else {
+        currentView = 'subject';
+        currentSubjectId = subjectId;
+      }
+      renderApp();
+    }
+
+    function openFolder(folderId) {
+      currentFolderId = folderId;
+      currentView = 'folder';
+      renderApp();
+    }
+
+    function renderApp() {
+      const root = document.getElementById('appRoot');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (currentView === 'home') {
+        renderHomeDashboard(root);
+      } else if (currentView === 'pyq_subfolders') {
+        renderPyqSubfoldersView(root);
+      } else if (currentView === 'subject') {
+        renderSubjectFoldersView(root);
+      } else if (currentView === 'folder') {
+        renderFolderBatchesView(root);
+      } else if (currentView === 'cbt_quiz') {
+        renderCBTQuizView(root);
+      } else if (currentView === 'quiz_result') {
+        renderQuizResultView(root);
+      } else if (currentView === 'bookmarks_view') {
+        renderBookmarksListView(root);
+      }
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    /* ==========================================================================
+       7. VIEW 1: CLEAN HOME DASHBOARD (SUBJECTS VIEW)
+       Strict Requirement: Display ONLY the 5 main category cards.
+       4 Exam sub-folders are COMPLETELY HIDDEN here.
+       ========================================================================== */
+    function renderHomeDashboard(container) {
+      container.innerHTML = `
+        <div class="space-y-8">
+          <!-- Hero Banner -->
+          <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 max-w-2xl space-y-3">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+                2025 Target Exams Preparation
+              </span>
+              <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                Master SSC, Railways & State Exams with Real CBT Practice
+              </h1>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Testbook-style CBT Mock Tests with live timer, bilingual questions (ಕನ್ನಡ & English), instant scorecards, Re-attempt Mistakes mode, topic analytics, and cloud persistence.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Access Cards: Bookmarked Questions & Mistakes -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div onclick="openBookmarksView()" class="cursor-pointer bg-amber-50 hover:bg-amber-100/80 border border-amber-200 rounded-2xl p-4 flex items-center justify-between transition-all shadow-xs">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-sm">
+                  <i data-lucide="bookmark" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-amber-950">⭐ Bookmarked Questions</h3>
+                  <p class="text-xs text-amber-800 mt-0.5">Quickly revise your starred questions</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold font-mono bg-white text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg">
+                ${bookmarkedQuestionIds.size} Saved
+              </span>
+            </div>
+
+            <div onclick="openMistakeNotebook()" class="cursor-pointer bg-rose-50 hover:bg-rose-100/80 border border-rose-200 rounded-2xl p-4 flex items-center justify-between transition-all shadow-xs">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold shadow-sm">
+                  <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-rose-950">📕 Mistake Notebook</h3>
+                  <p class="text-xs text-rose-800 mt-0.5">Questions answered incorrectly in tests</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold font-mono bg-white text-rose-900 border border-rose-300 px-2.5 py-1 rounded-lg">
+                ${mistakeNotebook.length} Items
+              </span>
+            </div>
+          </div>
+
+          <!-- Section Heading -->
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="layers" class="w-5 h-5 text-indigo-600"></i>
+                <span>Choose Exam Subject / Master Category</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Select a category below to explore dedicated exam folders and practice sets</p>
+            </div>
+            <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl">5 Subjects</span>
+          </div>
+
+          <!-- The 5 Category Cards (NO SUB-FOLDERS SHOWN ON HOME) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            ${examSubjects.map((subj, index) => {
+              const isPyq = subj.id === 'pyq';
+              const isEnglish = subj.id === 'english';
+
+              let totalBatches = 0;
+              let totalMCQs = 0;
+              subj.subCategories.forEach(sc => {
+                const bList = folderBatches[sc.id] || [];
+                totalBatches += bList.length;
+                totalMCQs += storedQuestions.filter(q => q.subCategoryId === sc.id).length;
+              });
+
+              return `
+                <div onclick="openSubject('${subj.id}')"
+                     class="group cursor-pointer bg-white rounded-2xl border-2 ${isPyq ? 'border-indigo-400 shadow-md ring-2 ring-indigo-500/10' : 'border-slate-200 hover:border-indigo-400'} p-5 sm:p-6 transition-all hover:shadow-xl active:scale-[0.98] flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="w-12 h-12 rounded-2xl ${isPyq ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 border border-indigo-100'} flex items-center justify-center font-bold shadow-sm transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                        <i data-lucide="${subj.iconName}" class="w-6 h-6"></i>
+                      </div>
+                      ${isPyq ? `
+                        <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200">
+                          Contains 4 Dedicated Folders
+                        </span>
+                      ` : isEnglish ? `
+                        <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">
+                          Sectional Tests Inside
+                        </span>
+                      ` : `
+                        <span class="text-xs font-bold text-slate-400 group-hover:text-indigo-600 font-mono">0${index + 1}</span>
+                      `}
+                    </div>
+
+                    <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-1.5 leading-snug">
+                      ${subj.name}
+                    </h3>
+                    <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                      ${subj.description}
+                    </p>
+                  </div>
+
+                  <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-bold text-slate-900 font-mono">${subj.subCategories.length}</span>
+                      <span>Folders</span>
+                      <span>·</span>
+                      <span class="font-bold text-indigo-700 font-mono">${totalBatches}</span>
+                      <span>Batches</span>
+                      <span>·</span>
+                      <span class="font-bold text-slate-900 font-mono">${totalMCQs}</span>
+                      <span>MCQs</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       8. VIEW 2: DEDICATED INNER VIEW FOR "PYQs" (4 EXAM FOLDERS)
+       Strict Requirement: Render the 4 exam cards ONLY here inside this inner view.
+       ========================================================================== */
+    function renderPyqSubfoldersView(container) {
+      const pyqSubject = examSubjects.find(s => s.id === 'pyq');
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <button onclick="navigateToHome()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-xs w-fit">
+              <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-600"></i>
+              <span>← Back to Subjects (ಮುಖ್ಯ ಪುಟ)</span>
+            </button>
+            <div class="text-xs text-slate-500 font-medium">Dashboard / PYQs - Previous Years' Papers</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md">
+                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-0.5">Master Exam Category</div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">PYQs - Previous Years' Papers (ಹಿಂದಿನ ಪ್ರಶ್ನೆಗಳು)</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Official TCS & SSC Exam Question Banks with Bilingual Explanations</p>
+              </div>
+            </div>
+            <span class="text-xs font-semibold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg w-fit">
+              4 Dedicated Folders
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+              <span>Select an Exam Folder to Practice Batches</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
+              ${pyqSubject.subCategories.map(sc => {
+                const bList = folderBatches[sc.id] || [];
+                const qCount = storedQuestions.filter(q => q.subCategoryId === sc.id).length;
+
+                return `
+                  <div onclick="openFolder('${sc.id}')"
+                       class="group cursor-pointer bg-white rounded-2xl border-2 border-slate-200 hover:border-indigo-500 p-5 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between active:scale-[0.98]">
+                    <div>
+                      <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                          <i data-lucide="${sc.iconName}" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                          ${sc.badge}
+                        </span>
+                      </div>
+                      <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-1.5">
+                        ${sc.name}
+                      </h3>
+                      <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                        ${sc.description}
+                      </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-indigo-700 font-mono">${bList.length}</span>
+                        <span>Batches</span>
+                        <span>·</span>
+                        <span class="font-bold text-slate-900 font-mono">${qCount}</span>
+                        <span>MCQs</span>
+                      </div>
+                      <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       9. VIEW 2B: SUBJECT FOLDERS VIEW (For GK, English, Quant, Reasoning)
+       ========================================================================== */
+    function renderSubjectFoldersView(container) {
+      const subject = examSubjects.find(s => s.id === currentSubjectId);
+      if (!subject) return navigateToHome();
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <button onclick="navigateToHome()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-xs w-fit">
+              <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-600"></i>
+              <span>← Back to Subjects (ಮುಖ್ಯ ಪುಟ)</span>
+            </button>
+            <div class="text-xs text-slate-500 font-medium">Dashboard / ${subject.name}</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                <i data-lucide="${subject.iconName}" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">${subject.name}</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">${subject.tagline}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
+            ${subject.subCategories.map(sc => {
+              const bList = folderBatches[sc.id] || [];
+              const qCount = storedQuestions.filter(q => q.subCategoryId === sc.id).length;
+
+              return `
+                <div onclick="openFolder('${sc.id}')"
+                     class="group cursor-pointer bg-white rounded-2xl border-2 border-slate-200 hover:border-indigo-500 p-5 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between active:scale-[0.98]">
+                  <div>
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i data-lucide="${sc.iconName}" class="w-5 h-5"></i>
+                      </div>
+                      <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">${sc.badge}</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-1.5">${sc.name}</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">${sc.description}</p>
+                  </div>
+                  <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-indigo-700 font-mono">${bList.length}</span>
+                      <span>Batches</span>
+                      <span>·</span>
+                      <span class="font-bold text-slate-900 font-mono">${qCount}</span>
+                      <span>MCQs</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       10. VIEW 3: FOLDER VIEW WITH USER BATCHES & BATCH TITLE FIX
+       Strict Requirement: Custom Batch Title in bold font right above MCQs badge!
+       ========================================================================== */
+    function renderFolderBatchesView(container) {
+      let activeFolder = null;
+      let activeSubject = null;
+      for (const subj of examSubjects) {
+        const found = subj.subCategories.find(sc => sc.id === currentFolderId);
+        if (found) {
+          activeFolder = found;
+          activeSubject = subj;
+          break;
+        }
+      }
+
+      if (!activeFolder) return navigateToHome();
+
+      const batches = folderBatches[currentFolderId] || [];
+      const isFromPyq = activeSubject.id === 'pyq';
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <button onclick="${isFromPyq ? "currentView='pyq_subfolders'; renderApp();" : "openSubject('" + activeSubject.id + "')"}"
+                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-xs w-fit">
+              <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-600"></i>
+              <span>← Back to ${isFromPyq ? "PYQs (4 Exam Folders)" : activeSubject.shortName}</span>
+            </button>
+            <div class="text-xs text-slate-500 font-medium">
+              ${activeSubject.shortName} / ${activeFolder.name}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700">
+                <i data-lucide="${activeFolder.iconName}" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-xs font-semibold text-indigo-600">${activeSubject.name} · Folder</span>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">${activeFolder.name}</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">${activeFolder.description}</p>
+              </div>
+            </div>
+
+            <button onclick="openAddBatchModal('${activeFolder.id}')"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>+ Add Batch / Upload JSON</span>
+            </button>
+          </div>
+
+          <div>
+            ${batches.length === 0 ? `
+              <div class="py-14 px-6 text-center bg-white rounded-2xl border-2 border-dashed border-slate-300 space-y-4 max-w-lg mx-auto my-6">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mx-auto">
+                  <i data-lucide="folder-open" class="w-6 h-6"></i>
+                </div>
+                <div class="space-y-1">
+                  <h3 class="text-base font-bold text-slate-900">No question batches added yet</h3>
+                  <p class="text-xs text-slate-500 max-w-sm mx-auto">Click '+ Add Batch / Upload JSON' above to add questions or import 100+ questions via JSON into this folder.</p>
+                </div>
+                <button onclick="openAddBatchModal('${activeFolder.id}')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                  <span>Add First Batch</span>
+                </button>
+              </div>
+            ` : `
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Question Batches in this Folder (${batches.length})</span>
+                  </h2>
+                  <span class="text-xs text-slate-500">Bilingual Practice Ready</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  ${batches.map((batch, idx) => {
+                    const displayTitle = (batch.title && batch.title.trim() && batch.title !== 'Custom Question Batch')
+                      ? batch.title.trim()
+                      : (batch.name && batch.name.trim())
+                      ? batch.name.trim()
+                      : `Batch ${idx + 1}`;
+
+                    return `
+                      <div class="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 p-5 shadow-xs transition-all space-y-4 flex flex-col justify-between">
+                        <div>
+                          <!-- BATCH TITLE IN BOLD FONT RIGHT ABOVE MCQS BADGE -->
+                          <div class="flex items-start justify-between gap-2 mb-2">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug line-clamp-2 break-words" title="${displayTitle}">
+                              ${displayTitle}
+                            </h3>
+                            <button onclick="deleteBatch('${batch.id}', '${activeFolder.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Batch">
+                              <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                          </div>
+
+                          <!-- MCQS COUNT BADGE RIGHT BELOW TITLE -->
+                          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-bold font-mono">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-indigo-600"></i>
+                            <span>${batch.questionCount} MCQs</span>
+                          </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+                          <button onclick="startCBTQuiz('${batch.id}', '${displayTitle.replace(/'/g, "\\'")}', '${activeFolder.id}')"
+                                  class="flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-95">
+                            <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                            <span>Practice CBT Quiz</span>
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       11. CBT MOCK TEST ENGINE & REAL-TIME STATE
+       Features: Live Countdown Timer, Pause/Resume, Question Palette,
+       Negative Marking (-0.25 / -0.5), Bilingual Toggle, Star Bookmark.
+       ========================================================================== */
+    let quizQuestions = [];
+    let currentQuestionIdx = 0;
+    let userAnswers = {};
+    let markedForReview = new Set();
+    let quizTimeRemaining = 0;
+    let quizTimerInterval = null;
+    let isQuizPaused = false;
+    let isReattemptMode = false;
+
+    function startCBTQuiz(batchId, batchTitle, folderId) {
+      currentBatchId = batchId;
+      currentBatchTitle = batchTitle;
+      currentFolderId = folderId;
+      isReattemptMode = false;
+
+      quizQuestions = storedQuestions.filter(q => q.subCategoryId === folderId && (q.setId === batchId || (!q.setId && batchId.includes('_1'))));
+      if (!quizQuestions.length) {
+        quizQuestions = storedQuestions.filter(q => q.subCategoryId === folderId);
+      }
+      if (!quizQuestions.length) {
+        showToast("No questions found in this batch.");
+        return;
+      }
+
+      initQuizSession();
+    }
+
+    function startReattemptQuiz(questionsSubset, parentTitle) {
+      if (!questionsSubset.length) {
+        showToast("No incorrect or skipped questions to re-attempt.");
+        return;
+      }
+      quizQuestions = [...questionsSubset];
+      currentBatchTitle = `Re-attempt: ${parentTitle}`;
+      isReattemptMode = true;
+      initQuizSession();
+    }
+
+    function initQuizSession() {
+      currentQuestionIdx = 0;
+      userAnswers = {};
+      markedForReview.clear();
+      isQuizPaused = false;
+      quizTimeRemaining = quizQuestions.length * 60; // 1 min per question
+
+      clearInterval(quizTimerInterval);
+      quizTimerInterval = setInterval(() => {
+        if (!isQuizPaused && quizTimeRemaining > 0) {
+          quizTimeRemaining--;
+          updateTimerDisplay();
+          if (quizTimeRemaining <= 0) {
+            clearInterval(quizTimerInterval);
+            submitCBTQuiz();
+          }
+        }
+      }, 1000);
+
+      currentView = 'cbt_quiz';
+      renderApp();
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('quizTimerText');
+      if (el) {
+        const mins = Math.floor(quizTimeRemaining / 60);
+        const secs = quizTimeRemaining % 60;
+        el.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+    }
+
+    function toggleQuizPause() {
+      isQuizPaused = !isQuizPaused;
+      const btn = document.getElementById('pauseBtnText');
+      if (btn) btn.innerText = isQuizPaused ? 'Resume' : 'Pause';
+      showToast(isQuizPaused ? "Exam paused." : "Exam resumed.");
+    }
+
+    function toggleBookmarkInQuiz(qId) {
+      if (bookmarkedQuestionIds.has(qId)) {
+        bookmarkedQuestionIds.delete(qId);
+        showToast("Question removed from Bookmarks.");
+      } else {
+        bookmarkedQuestionIds.add(qId);
+        showToast("Question saved to Bookmarks!");
+      }
+      saveLocalData();
+      updateBadges();
+      renderApp();
+    }
+
+    function renderCBTQuizView(container) {
+      const q = quizQuestions[currentQuestionIdx];
+      const selected = userAnswers[q.id];
+      const isMarked = markedForReview.has(q.id);
+      const isBookmarked = bookmarkedQuestionIds.has(q.id);
+
+      const mins = Math.floor(quizTimeRemaining / 60);
+      const secs = quizTimeRemaining % 60;
+      const formattedTimer = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <!-- CBT Top Header & Timer Bar -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <button onclick="confirmExitQuiz()" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all" title="Exit Quiz">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+              </button>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-sm sm:text-base font-bold text-slate-900">${currentBatchTitle}</h2>
+                  ${isReattemptMode ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Mistakes Re-attempt</span>' : ''}
+                </div>
+                <span class="text-xs text-slate-500">Question ${currentQuestionIdx + 1} of ${quizQuestions.length}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <!-- Live Timer -->
+              <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 text-white font-mono font-bold text-sm shadow-inner">
+                <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                <span id="quizTimerText">${formattedTimer}</span>
+              </div>
+
+              <!-- Pause Button -->
+              <button onclick="toggleQuizPause()" class="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-all">
+                <span id="pauseBtnText">${isQuizPaused ? 'Resume' : 'Pause'}</span>
+              </button>
+
+              <!-- Language Toggle -->
+              <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                <button onclick="setQuizLang('dual')" class="px-2.5 py-1 rounded-lg ${userLang === 'dual' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600'}">Dual</button>
+                <button onclick="setQuizLang('en')" class="px-2.5 py-1 rounded-lg ${userLang === 'en' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600'}">EN</button>
+                <button onclick="setQuizLang('kn')" class="px-2.5 py-1 rounded-lg ${userLang === 'kn' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600'}">ಕನ್ನಡ</button>
+              </div>
+
+              <!-- Submit Test Button -->
+              <button onclick="submitCBTQuiz()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all">
+                Submit Test
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Test Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <!-- Question Box -->
+            <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between min-h-[460px]">
+              <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold font-mono flex items-center justify-center">${currentQuestionIdx + 1}</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">${q.topic || q.examTag || 'General Awareness'}</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <!-- Bookmark Star Button -->
+                    <button onclick="toggleBookmarkInQuiz('${q.id}')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border ${isBookmarked ? 'bg-amber-50 text-amber-600 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'} text-xs transition-all hover:bg-amber-50">
+                      <i data-lucide="star" class="w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-400 text-amber-500' : ''}"></i>
+                      <span>${isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+                    </button>
+
+                    <div class="flex items-center gap-1.5 text-xs font-semibold">
+                      <span class="text-emerald-600 font-mono">+2.00</span>
+                      <span class="text-slate-300">|</span>
+                      <span class="text-rose-600 font-mono">-0.50</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  ${userLang !== 'kn' ? `<p class="text-base sm:text-lg font-semibold text-slate-900 leading-relaxed">${q.question}</p>` : ''}
+                  ${userLang !== 'en' && q.questionKn ? `<p class="text-base sm:text-lg font-medium text-indigo-950 font-kannada leading-relaxed bg-indigo-50/40 p-3 rounded-xl border border-indigo-100">${q.questionKn}</p>` : ''}
+                </div>
+
+                <div class="space-y-3 pt-2">
+                  ${q.options.map((optEn, oIdx) => {
+                    const optKn = (q.optionsKn && q.optionsKn[oIdx]) ? q.optionsKn[oIdx] : null;
+                    const isSelected = selected === oIdx;
+
+                    return `
+                      <label onclick="selectAnswer('${q.id}', ${oIdx})"
+                             class="flex items-start gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${isSelected ? 'border-indigo-600 bg-indigo-50/60 ring-2 ring-indigo-500/20' : 'border-slate-200 hover:border-slate-300 bg-white'}">
+                        <input type="radio" name="opt_${q.id}" ${isSelected ? 'checked' : ''} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                        <div class="flex-1 space-y-1">
+                          ${userLang !== 'kn' ? `<div class="text-sm font-semibold text-slate-800">${optEn}</div>` : ''}
+                          ${userLang !== 'en' && optKn ? `<div class="text-sm font-medium text-indigo-900 font-kannada">${optKn}</div>` : ''}
+                        </div>
+                      </label>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <!-- Question Navigation Bar -->
+              <div class="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 mt-6">
+                <div class="flex items-center gap-2">
+                  <button onclick="toggleMarkForReview('${q.id}')" class="px-3.5 py-2 rounded-xl border ${isMarked ? 'bg-purple-100 text-purple-700 border-purple-300' : 'bg-slate-50 text-slate-700 border-slate-300'} hover:bg-slate-100 text-xs font-bold transition-all">
+                    ${isMarked ? '★ Marked for Review' : '☆ Mark for Review'}
+                  </button>
+                  ${selected !== undefined ? `
+                    <button onclick="clearAnswer('${q.id}')" class="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-semibold">
+                      Clear Response
+                    </button>
+                  ` : ''}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button onclick="navigateQuestion(${currentQuestionIdx - 1})" ${currentQuestionIdx === 0 ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all">
+                    Previous
+                  </button>
+                  <button onclick="navigateQuestion(${currentQuestionIdx + 1})" ${currentQuestionIdx === quizQuestions.length - 1 ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all">
+                    Save & Next
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CBT Question Palette -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+              <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Question Palette</h3>
+              
+              <div class="grid grid-cols-2 gap-2 text-[11px] font-medium text-slate-600">
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Answered</div>
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-500"></span> Review</div>
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200"></span> Not Visited</div>
+              </div>
+
+              <div class="grid grid-cols-5 gap-2 pt-2">
+                ${quizQuestions.map((item, idx) => {
+                  const isAns = userAnswers[item.id] !== undefined;
+                  const isRev = markedForReview.has(item.id);
+                  const isCur = idx === currentQuestionIdx;
+
+                  let colorClass = "bg-slate-100 text-slate-700 hover:bg-slate-200";
+                  if (isRev) colorClass = "bg-purple-600 text-white font-bold";
+                  else if (isAns) colorClass = "bg-emerald-600 text-white font-bold";
+
+                  return `
+                    <button onclick="navigateQuestion(${idx})" class="w-9 h-9 rounded-xl text-xs font-mono transition-all flex items-center justify-center ${colorClass} ${isCur ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}">
+                      ${idx + 1}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setQuizLang(lang) {
+      userLang = lang;
+      renderApp();
+    }
+
+    function selectAnswer(qId, oIdx) {
+      userAnswers[qId] = oIdx;
+      renderApp();
+    }
+
+    function clearAnswer(qId) {
+      delete userAnswers[qId];
+      renderApp();
+    }
+
+    function toggleMarkForReview(qId) {
+      if (markedForReview.has(qId)) markedForReview.delete(qId);
+      else markedForReview.add(qId);
+      renderApp();
+    }
+
+    function navigateQuestion(newIdx) {
+      if (newIdx >= 0 && newIdx < quizQuestions.length) {
+        currentQuestionIdx = newIdx;
+        renderApp();
+      }
+    }
+
+    function confirmExitQuiz() {
+      if (confirm("Are you sure you want to pause and exit this test? Your answers will be discarded.")) {
+        clearInterval(quizTimerInterval);
+        currentView = 'folder';
+        renderApp();
+      }
+    }
+
+    /* ==========================================================================
+       12. VIEW 4: QUIZ RESULT, RE-ATTEMPT MODE & TOPIC PERFORMANCE ANALYTICS
+       ========================================================================== */
+    let lastQuizStats = null;
+    let lastFailedQuestions = [];
+
+    function submitCBTQuiz() {
+      clearInterval(quizTimerInterval);
+
+      let correct = 0;
+      let wrong = 0;
+      let unattempted = 0;
+      const failed = [];
+      const topicStats = {};
+
+      quizQuestions.forEach(q => {
+        const userAns = userAnswers[q.id];
+        const topicName = q.topic || q.examTag || 'General';
+
+        if (!topicStats[topicName]) {
+          topicStats[topicName] = { total: 0, correct: 0, wrong: 0, unattempted: 0 };
+        }
+        topicStats[topicName].total++;
+
+        if (userAns === undefined) {
+          unattempted++;
+          topicStats[topicName].unattempted++;
+          failed.push(q);
+        } else if (userAns === q.correctAnswerIndex) {
+          correct++;
+          topicStats[topicName].correct++;
+        } else {
+          wrong++;
+          topicStats[topicName].wrong++;
+          failed.push(q);
+          saveMistakeItem(q, userAns);
+        }
+      });
+
+      const totalScore = (correct * 2) - (wrong * 0.5);
+      const accuracy = (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
+
+      lastFailedQuestions = failed;
+      lastQuizStats = {
+        total: quizQuestions.length,
+        correct,
+        wrong,
+        unattempted,
+        score: totalScore,
+        accuracy,
+        batchTitle: currentBatchTitle,
+        topicStats
+      };
+
+      currentView = 'quiz_result';
+      renderApp();
+    }
+
+    function renderQuizResultView(container) {
+      if (!lastQuizStats) return navigateToHome();
+
+      container.innerHTML = `
+        <div class="space-y-6 max-w-4xl mx-auto">
+          <!-- Scorecard Card -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-md text-center space-y-6">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <i data-lucide="award" class="w-4 h-4"></i>
+                Performance Scorecard
+              </span>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">${lastQuizStats.batchTitle}</h1>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+              <div class="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-4">
+                <span class="text-xs text-indigo-700 font-bold block mb-1">Final Score</span>
+                <span class="text-2xl sm:text-3xl font-black text-indigo-900 font-mono">${lastQuizStats.score.toFixed(1)}</span>
+              </div>
+              <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+                <span class="text-xs text-emerald-700 font-bold block mb-1">Correct (+2.0)</span>
+                <span class="text-2xl sm:text-3xl font-black text-emerald-800 font-mono">${lastQuizStats.correct}</span>
+              </div>
+              <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4">
+                <span class="text-xs text-rose-700 font-bold block mb-1">Wrong (-0.5)</span>
+                <span class="text-2xl sm:text-3xl font-black text-rose-800 font-mono">${lastQuizStats.wrong}</span>
+              </div>
+              <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4">
+                <span class="text-xs text-amber-700 font-bold block mb-1">Accuracy</span>
+                <span class="text-2xl sm:text-3xl font-black text-amber-800 font-mono">${lastQuizStats.accuracy}%</span>
+              </div>
+            </div>
+
+            <!-- ACTION BUTTONS: RE-ATTEMPT MISTAKES & RETAKE -->
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+              ${lastFailedQuestions.length > 0 ? `
+                <button onclick="startReattemptQuiz(lastFailedQuestions, '${lastQuizStats.batchTitle.replace(/'/g, "\\'")}')"
+                        class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm transition-all active:scale-95">
+                  <i data-lucide="zap" class="w-4 h-4"></i>
+                  <span>Re-attempt Incorrect Questions (${lastFailedQuestions.length})</span>
+                </button>
+              ` : ''}
+
+              <button onclick="startCBTQuiz('${currentBatchId}', '${currentBatchTitle.replace(/'/g, "\\'")}', '${currentFolderId}')"
+                      class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Retake Full Test</span>
+              </button>
+
+              <button onclick="currentView='folder'; renderApp();" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs sm:text-sm font-bold">
+                Return to Folder
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. WEAK VS STRONG AREAS PERFORMANCE ANALYTICS -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-600"></i>
+                  <span>Weak vs Strong Areas (Topic-wise Breakdown)</span>
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Identify which concepts require focused revision</p>
+              </div>
+              <span class="text-xs font-bold text-slate-600 font-mono">${Object.keys(lastQuizStats.topicStats).length} Topics</span>
+            </div>
+
+            <div class="space-y-3">
+              ${Object.entries(lastQuizStats.topicStats).map(([topic, stats]) => {
+                const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+                const isStrong = acc >= 70;
+                const isModerate = acc >= 40 && acc < 70;
+                const isWeak = acc < 40;
+
+                let badgeText = isStrong ? "Strong Area" : isModerate ? "Moderate" : "Weak Area (Focus)";
+                let badgeClass = isStrong ? "bg-emerald-100 text-emerald-800 border-emerald-300" : isModerate ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-rose-100 text-rose-800 border-rose-300";
+                let barColor = isStrong ? "bg-emerald-500" : isModerate ? "bg-amber-500" : "bg-rose-500";
+
+                return `
+                  <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-xs sm:text-sm font-bold text-slate-900">${topic}</span>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-md border ${badgeClass}">
+                          ${badgeText}
+                        </span>
+                        <span class="text-xs font-bold font-mono text-slate-800">${stats.correct}/${stats.total} (${acc}%)</span>
+                      </div>
+                    </div>
+                    <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                      <div class="h-full rounded-full ${barColor}" style="width: ${acc}%"></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Untruncated Bilingual Solutions List -->
+          <div class="space-y-4">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="file-check" class="w-5 h-5 text-indigo-600"></i>
+              <span>Detailed Question Solutions & Bilingual Explanations</span>
+            </h2>
+
+            <div class="space-y-4">
+              ${quizQuestions.map((q, idx) => {
+                const userAns = userAnswers[q.id];
+                const isCorrect = userAns === q.correctAnswerIndex;
+                const isSkipped = userAns === undefined;
+                const isBookmarked = bookmarkedQuestionIds.has(q.id);
+
+                return `
+                  <div class="bg-white rounded-2xl border-2 ${isCorrect ? 'border-emerald-200' : isSkipped ? 'border-slate-200' : 'border-rose-200'} p-5 sm:p-6 space-y-4 shadow-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold font-mono px-2.5 py-1 rounded-md ${isCorrect ? 'bg-emerald-100 text-emerald-800' : isSkipped ? 'bg-slate-100 text-slate-700' : 'bg-rose-100 text-rose-800'}">
+                        Q${idx + 1} · ${isCorrect ? 'Correct (+2)' : isSkipped ? 'Not Attempted' : 'Incorrect (-0.5)'}
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <button onclick="toggleBookmarkInQuiz('${q.id}')" class="text-xs ${isBookmarked ? 'text-amber-600 font-bold' : 'text-slate-500'} hover:text-amber-600 flex items-center gap-1">
+                          <i data-lucide="star" class="w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-400 text-amber-500' : ''}"></i>
+                          <span>${isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+                        </button>
+                        <button onclick="saveMistakeItemDirectly('${q.id}')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+                          <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+                          <span>Save Mistake</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <p class="text-base font-semibold text-slate-900">${q.question}</p>
+                      ${q.questionKn ? `<p class="text-sm font-medium text-indigo-950 font-kannada bg-indigo-50/30 p-2 rounded-lg">${q.questionKn}</p>` : ''}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      ${q.options.map((opt, oIdx) => {
+                        const isAnsOption = q.correctAnswerIndex === oIdx;
+                        const isUserOption = userAns === oIdx;
+                        let optStyle = "bg-slate-50 border-slate-200 text-slate-700";
+                        if (isAnsOption) optStyle = "bg-emerald-50 border-emerald-400 text-emerald-900 font-bold";
+                        else if (isUserOption) optStyle = "bg-rose-50 border-rose-400 text-rose-900 line-through";
+
+                        return `
+                          <div class="p-2.5 rounded-xl border ${optStyle} flex items-center justify-between">
+                            <span>${opt}</span>
+                            ${isAnsOption ? '<span class="text-emerald-700 font-bold">✓ Correct Answer</span>' : ''}
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+
+                    <div class="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100 space-y-2">
+                      <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-900">
+                        <i data-lucide="info" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Deep Solution & Analysis (ಪೂರ್ಣ ವಿವರಣೆ):</span>
+                      </div>
+                      ${q.explanation ? `<p class="text-xs sm:text-sm text-slate-800 leading-relaxed">${q.explanation}</p>` : ''}
+                      ${q.explanationKn ? `<p class="text-xs sm:text-sm text-indigo-950 font-kannada leading-relaxed pt-2 border-t border-indigo-100">${q.explanationKn}</p>` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       13. BOOKMARKS LIST VIEW (Quick Revision Section)
+       ========================================================================== */
+    function openBookmarksView() {
+      currentView = 'bookmarks_view';
+      renderApp();
+    }
+
+    function renderBookmarksListView(container) {
+      const bookmarkedList = storedQuestions.filter(q => bookmarkedQuestionIds.has(q.id));
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <button onclick="navigateToHome()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-xs w-fit">
+              <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-600"></i>
+              <span>← Back to Dashboard</span>
+            </button>
+            <div class="text-xs text-slate-500 font-medium">Dashboard / Bookmarked Questions</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md">
+                <i data-lucide="star" class="w-6 h-6 fill-white"></i>
+              </div>
+              <div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Bookmarked Questions (${bookmarkedList.length})</h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">High-priority questions starred during practice for fast revision</p>
+              </div>
+            </div>
+
+            ${bookmarkedList.length > 0 ? `
+              <button onclick="startCBTQuiz('bookmarks_custom', 'Bookmarked Questions Quiz', '${bookmarkedList[0].subCategoryId}')"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95">
+                <i data-lucide="play" class="w-4 h-4"></i>
+                <span>Practice All Bookmarks (${bookmarkedList.length})</span>
+              </button>
+            ` : ''}
+          </div>
+
+          <div class="space-y-4">
+            ${bookmarkedList.length === 0 ? `
+              <div class="py-14 px-6 text-center bg-white rounded-2xl border-2 border-dashed border-slate-300 space-y-3 max-w-md mx-auto">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
+                  <i data-lucide="bookmark" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">No bookmarked questions yet</h3>
+                <p class="text-xs text-slate-500">Tap the '★ Bookmark' button on any question during test practice to save it here for targeted revision.</p>
+              </div>
+            ` : bookmarkedList.map((q, idx) => `
+              <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700">Question ${idx + 1}</span>
+                  <button onclick="toggleBookmarkInQuiz('${q.id}')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Remove Bookmark</span>
+                  </button>
+                </div>
+
+                <div class="space-y-1.5">
+                  <p class="text-base font-semibold text-slate-900">${q.question}</p>
+                  ${q.questionKn ? `<p class="text-sm font-medium text-indigo-950 font-kannada bg-indigo-50/40 p-2 rounded-lg">${q.questionKn}</p>` : ''}
+                </div>
+
+                <div class="text-xs text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 font-semibold">
+                  Correct Answer: ${q.options[q.correctAnswerIndex]}
+                </div>
+
+                ${q.explanation ? `
+                  <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 leading-relaxed">
+                    <span class="font-bold text-slate-800 block">Explanation:</span>
+                    <p>${q.explanation}</p>
+                    ${q.explanationKn ? `<p class="font-kannada text-indigo-900 pt-1 border-t border-slate-200">${q.explanationKn}</p>` : ''}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       14. MISTAKE NOTEBOOK ENGINE
+       ========================================================================== */
+    function saveMistakeItem(q, userSelectedIdx) {
+      if (!mistakeNotebook.some(m => m.questionId === q.id)) {
+        const item = {
+          id: `mistake_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          questionId: q.id,
+          question: q.question,
+          questionKn: q.questionKn,
+          options: q.options,
+          correctAnswerIndex: q.correctAnswerIndex,
+          userSelectedIndex: userSelectedIdx,
+          explanation: q.explanation,
+          explanationKn: q.explanationKn,
+          subjectId: q.subjectId,
+          subCategoryId: q.subCategoryId,
+          savedAt: Date.now()
+        };
+        mistakeNotebook.push(item);
+        saveLocalData();
+        if (db) {
+          db.collection('mistake_notebook').doc(item.id).set(item).catch(() => {});
+        }
+      }
+    }
+
+    function saveMistakeItemDirectly(qId) {
+      const q = storedQuestions.find(item => item.id === qId);
+      if (q) {
+        saveMistakeItem(q, userAnswers[qId] !== undefined ? userAnswers[qId] : -1);
+        showToast("Added to Mistake Notebook!");
+      }
+    }
+
+    function openMistakeNotebook() {
+      const modal = document.getElementById('modalContainer');
+      modal.innerHTML = `
+        <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="book-open" class="w-5 h-5 text-rose-400"></i>
+                <h3 class="font-bold text-base sm:text-lg">Mistake Notebook (${mistakeNotebook.length})</h3>
+              </div>
+              <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-4 flex-1">
+              ${mistakeNotebook.length === 0 ? `
+                <div class="py-12 text-center text-slate-500 space-y-2">
+                  <i data-lucide="check-circle" class="w-10 h-10 text-emerald-500 mx-auto"></i>
+                  <p class="font-bold">No mistakes recorded yet!</p>
+                  <p class="text-xs">Questions answered incorrectly in CBT mock tests will automatically appear here for revision.</p>
+                </div>
+              ` : mistakeNotebook.map(m => `
+                <div class="border border-slate-200 rounded-2xl p-4 space-y-3 bg-slate-50/50">
+                  <div class="flex items-start justify-between gap-2">
+                    <p class="text-xs sm:text-sm font-bold text-slate-900">${m.question}</p>
+                    <button onclick="deleteMistake('${m.id}')" class="text-slate-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                  </div>
+                  ${m.questionKn ? `<p class="text-xs text-indigo-950 font-kannada">${m.questionKn}</p>` : ''}
+                  <div class="text-xs text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 font-semibold">
+                    Correct: ${m.options ? m.options[m.correctAnswerIndex] : 'Option ' + (m.correctAnswerIndex + 1)}
+                  </div>
+                  ${m.explanation ? `<p class="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">${m.explanation}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function deleteMistake(mId) {
+      mistakeNotebook = mistakeNotebook.filter(m => m.id !== mId);
+      saveLocalData();
+      if (db) db.collection('mistake_notebook').doc(mId).delete().catch(() => {});
+      openMistakeNotebook();
+    }
+
+    /* ==========================================================================
+       15. ADD BATCH / UPLOAD JSON MODAL
+       ========================================================================== */
+    function openAddBatchModal(folderId) {
+      const modal = document.getElementById('modalContainer');
+      modal.innerHTML = `
+        <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+              <div class="flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-indigo-400"></i>
+                <h3 class="font-bold text-base">Add Batch / Upload JSON</h3>
+              </div>
+              <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Custom Batch Title (ಹೆಸರು / ಶೀರ್ಷಿಕೆ):</label>
+                <input id="inputBatchTitle" type="text" placeholder="e.g. ಸಂವಿಧಾನದ ಪ್ರಮುಖ ವಿಧಿಗಳು - Batch 1, SSC CGL Tier 1 Mock 2"
+                       class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <p class="text-[11px] text-slate-400 mt-1">If blank, it will auto-detect from JSON or default to 'Batch 1'.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Upload .json File or Paste JSON Array:</label>
+                <input type="file" id="jsonFileInput" accept=".json,application/json" onchange="handleFileSelect(event)" class="text-xs mb-2 block w-full">
+                <textarea id="jsonTextInput" rows="6" placeholder='[ { "question": "What is...", "options": ["A","B","C","D"], "correctAnswerIndex": 0, "explanation": "..." } ]'
+                          class="w-full text-xs font-mono p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+              </div>
+
+              <button onclick="processBatchUpload('${folderId}')" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition-all">
+                Save & Import Batch to Cloud
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const text = ev.target.result;
+        document.getElementById('jsonTextInput').value = text;
+        try {
+          const parsed = JSON.parse(text);
+          const autoTitle = parsed.name || parsed.title || parsed.setName || (Array.isArray(parsed) && parsed[0] ? parsed[0].setName || parsed[0].set?.name || parsed[0].set?.title : '');
+          if (autoTitle) document.getElementById('inputBatchTitle').value = autoTitle;
+        } catch(err) {}
+      };
+      reader.readAsText(file);
+    }
+
+    function processBatchUpload(folderId) {
+      const rawText = document.getElementById('jsonTextInput').value.trim();
+      let inputTitle = document.getElementById('inputBatchTitle').value.trim();
+
+      if (!rawText) {
+        showToast("Please paste JSON or pick a .json file.");
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(rawText);
+        const questionsList = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.data || []);
+        if (!questionsList.length) {
+          showToast("No questions found in JSON array.");
+          return;
+        }
+
+        const autoTitle = parsed.name || parsed.title || parsed.setName || questionsList[0]?.setName || questionsList[0]?.set?.name || questionsList[0]?.set?.title || 'Batch 1';
+        const finalTitle = inputTitle || autoTitle;
+        const newBatchId = `batch_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+
+        const formatted = questionsList.map((q, idx) => ({
+          id: q.id || `q_${Date.now()}_${idx}`,
+          subjectId: currentSubjectId || 'pyq',
+          subCategoryId: folderId,
+          setId: newBatchId,
+          setName: finalTitle,
+          topic: q.topic || finalTitle,
+          question: q.question || q.questionEn || `Question ${idx + 1}`,
+          questionKn: q.questionKn || q.kannadaQuestion || null,
+          options: q.options || q.optionsEn || ["A", "B", "C", "D"],
+          optionsKn: q.optionsKn || null,
+          correctAnswerIndex: typeof q.correctAnswerIndex === 'number' ? q.correctAnswerIndex : 0,
+          explanation: q.explanation || q.explanationEn || "Detailed explanation provided.",
+          explanationKn: q.explanationKn || null,
+          examTag: q.examTag || finalTitle,
+          difficulty: q.difficulty || "Medium",
+          year: q.year || 2025
+        }));
+
+        storedQuestions.push(...formatted);
+        rebuildBatchesFromQuestions();
+        saveLocalData();
+
+        const newBatchObj = { id: newBatchId, title: finalTitle, folderId: folderId };
+        syncBatchToFirestore(newBatchObj, formatted);
+
+        closeModal();
+        showToast(`Batch '${finalTitle}' added successfully!`);
+        renderFolderBatchesView(document.getElementById('appRoot'));
+      } catch (e) {
+        alert("Failed to parse JSON: " + e.message);
+      }
+    }
+
+    function deleteBatch(batchId, folderId) {
+      if (confirm("Are you sure you want to delete this question batch?")) {
+        storedQuestions = storedQuestions.filter(q => q.setId !== batchId);
+        rebuildBatchesFromQuestions();
+        saveLocalData();
+        deleteBatchFromFirestore(batchId);
+        showToast("Batch deleted.");
+        renderFolderBatchesView(document.getElementById('appRoot'));
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modalContainer').innerHTML = "";
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toastMsg');
+      if (toast && text) {
+        text.innerText = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => {
+          toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3200);
+      }
+    }
+
+    /* ==========================================================================
+       16. PWA INSTALLATION PROMPT
+       ========================================================================== */
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    function triggerPWAInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          const btn = document.getElementById('pwaInstallBtn');
+          if (btn) btn.classList.add('hidden');
+        });
+      } else {
+        alert("To install ExamPrep Pro on Mobile/Desktop:\nTap your browser menu (⋮ or Share) and select 'Add to Home Screen' / 'Install App'.");
+      }
+    }
+
+    // App Initialization on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadLocalData();
+      initFirebaseSync();
+      renderApp();
+    });
+  </script>
+</body>
+</html>

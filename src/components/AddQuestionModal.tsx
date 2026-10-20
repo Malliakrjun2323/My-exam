@@ -239,6 +239,17 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
         if (Array.isArray(arr)) {
           setParsedCount(arr.length);
           setBulkError(null);
+          // Auto-populate batch title from file/JSON metadata if not yet entered
+          const autoTitle =
+            parsed.name ||
+            parsed.title ||
+            parsed.setName ||
+            parsed.set?.name ||
+            parsed.set?.title ||
+            (arr[0] ? arr[0].setName || arr[0].set?.name || arr[0].set?.title || arr[0].name || arr[0].title : '');
+          if (autoTitle && typeof autoTitle === 'string' && !customSetName.trim()) {
+            setCustomSetName(autoTitle);
+          }
         } else {
           setBulkError('JSON file must contain an array of question objects.');
         }
@@ -266,13 +277,26 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
         return;
       }
 
-      if (!customSetName.trim()) {
-        setBulkError('Batch / Set Title is mandatory (ಕಡ್ಡಾಯ). Please provide a title (ಉದಾಹರಣೆಗೆ: "ಸಂವಿಧಾನದ ಪ್ರಮುಖ ವಿಧಿಗಳು - Batch 1", "Modern History Mock 1").');
-        return;
-      }
+      // Auto-resolve batch title from customSetName, JSON root, or question item metadata, or fallback to 'Batch 1'
+      const detectedBatchTitle =
+        customSetName.trim() ||
+        parsed.name ||
+        parsed.title ||
+        parsed.setName ||
+        parsed.set?.name ||
+        parsed.set?.title ||
+        items[0]?.setName ||
+        items[0]?.set?.name ||
+        items[0]?.set?.title ||
+        items[0]?.name ||
+        items[0]?.title ||
+        `Batch ${existingSetsCount + 1}`;
+
+      const finalSetName = (typeof detectedBatchTitle === 'string' && detectedBatchTitle.trim())
+        ? detectedBatchTitle.trim()
+        : `Batch ${existingSetsCount + 1}`;
 
       // Generate distinct set ID and Name to PREVENT question merging
-      const finalSetName = customSetName.trim();
       const newSetId = `set_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const now = Date.now();
 
@@ -391,12 +415,7 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
       optionDKn.trim() || optionDEn.trim(),
     ];
 
-    if (!customSetName.trim()) {
-      setErrorMessage('Batch / Set Title is mandatory (ಕಡ್ಡಾಯ). Please provide a title (ಉದಾಹರಣೆಗೆ: "ಸಂವಿಧಾನದ ಪ್ರಮುಖ ವಿಧಿಗಳು - Batch 1", "Modern History Mock 1").');
-      return;
-    }
-
-    const finalSetName = customSetName.trim();
+    const finalSetName = customSetName.trim() || `Batch ${existingSetsCount + 1}`;
     const newSetId = `set_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
     const newQuestion: Question = {
